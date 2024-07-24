@@ -1,12 +1,15 @@
-import { setSDKInstance, mock, restore } from 'aws-sdk-mock';
+import AWSMock from 'aws-sdk-mock';
 import AWS from 'aws-sdk';
-import { handler } from './index';
-require('dotenv').config();
+import { handler } from './index.js';
+import dotenv from 'dotenv';
+import twilio from 'twilio';
 
-setSDKInstance(AWS);
+dotenv.config();
+
+AWSMock.setSDKInstance(AWS);
 
 // Mock SQS receiveMessage
-mock('SQS', 'receiveMessage', (params, callback) => {
+AWSMock.mock('SQS', 'receiveMessage', (params, callback) => {
   callback(null, {
     Messages: [
       {
@@ -19,12 +22,11 @@ mock('SQS', 'receiveMessage', (params, callback) => {
 });
 
 // Mock SQS deleteMessage
-mock('SQS', 'deleteMessage', (params, callback) => {
+AWSMock.mock('SQS', 'deleteMessage', (params, callback) => {
   callback(null, {});
 });
 
 // Mock Twilio messages.create
-import twilio from 'twilio';
 jest.mock('twilio', () => {
   const mockTwilio = {
     messages: {
@@ -43,5 +45,5 @@ jest.mock('twilio', () => {
   } catch (error) {
     console.error('Error:', error);
   }
-  restore();
+  AWSMock.restore();
 })();

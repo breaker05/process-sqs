@@ -1,14 +1,16 @@
-import { SQS } from 'aws-sdk';
+import AWS from 'aws-sdk';
 import twilio from 'twilio';
-require('dotenv').config();
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 // Initialize AWS SQS
-const sqs = new SQS({ region: 'us-east-1' });
+const sqs = new AWS.SQS({ region: 'us-east-1' });
 
 // Initialize Twilio
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
-const client = new twilio(accountSid, authToken);
+const client = twilio(accountSid, authToken);
 
 // SQS Queue URL
 const queueURL = process.env.SQS_QUEUE_URL;
@@ -17,7 +19,7 @@ const queueURL = process.env.SQS_QUEUE_URL;
 const twilioFromNumber = process.env.TWILIO_FROM_NUMBER;
 const twilioToNumber = process.env.TWILIO_TO_NUMBER;
 
-export async function handler(event) {
+export const handler = async (event) => {
   try {
     // Receive message from SQS
     const params = {
@@ -64,4 +66,4 @@ export async function handler(event) {
       body: JSON.stringify('Error processing message')
     };
   }
-}
+};
